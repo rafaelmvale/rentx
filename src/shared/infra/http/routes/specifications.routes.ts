@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { CreateSpecificationController } from "@modules/cars/useCases/createSpecification/CreateSpecificationController";
-import { ensureAuthenticate } from "@shared/infra/http/middlewares/ensureAuthenticate";
+import { ensureAuthenticated } from "@shared/infra/http/middlewares/ensureAuthenticated";
 import { ensureAdmin } from "@shared/infra/http/middlewares/ensureAdmin";
 
 
@@ -11,7 +11,7 @@ const createSpecificationController = new CreateSpecificationController()
 
 
 specificationsRoutes.post("/",
-  ensureAuthenticate,
+  ensureAuthenticated,
   ensureAdmin,
   createSpecificationController.handle);
 
