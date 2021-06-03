@@ -1,7 +1,9 @@
+import "reflect-metadata"
 import { inject, injectable } from "tsyringe";
-import { Car } from "@modules/cars/infra/typeorm/entities/Car";
+
 import { ICarsRepository } from "@modules/cars/repositories/ICarsRepository";
 import { ISpecificationsRepository } from "@modules/cars/repositories/ISpecificationsRepository";
+import { Car } from "@modules/cars/infra/typeorm/entities/Car";
 import { AppError } from "@shared/errors/AppError";
 
 interface IRequest {
@@ -9,13 +11,13 @@ interface IRequest {
   specifications_id: string[];
 }
 
-// @injectable()
+@injectable()
 class CreateCarSpecificationUseCase {
   constructor(
-    // @inject("CarsRepository")
+    @inject("CarsRepository")
     private carsRepository: ICarsRepository,
 
-    // @inject("SpecificationsRepository")
+    @inject("SpecificationsRepository")
     private specificationsRepository: ISpecificationsRepository
   ) { }
   async execute({ car_id, specifications_id }: IRequest): Promise<Car> {
@@ -28,7 +30,6 @@ class CreateCarSpecificationUseCase {
     const specifications = await this.specificationsRepository.findByIds(specifications_id);
 
 
-    console.log(specifications)
     carExists.specifications = specifications;
 
     await this.carsRepository.create(carExists);
