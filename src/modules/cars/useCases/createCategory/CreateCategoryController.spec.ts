@@ -7,7 +7,6 @@ import { app } from '@shared/infra/http/app';
 import createConnection from "@shared/infra/typeorm";
 
 let connection: Connection;
-let adminToken: string;
 
 describe("Create Category Controller", () => {
   beforeAll(async () => {
@@ -21,16 +20,6 @@ describe("Create Category Controller", () => {
       INSERT INTO USERS(id, name, email, password, "isAdmin", created_at, driver_license)
       values('${id}', 'admin', 'admin@rentx.com', '${password}', true, 'now()', 'XXXXXXXXX')
       `);
-
-    const { body: responseToken } = await request(app)
-      .post('/sessions')
-      .send({
-        email: "admin@rentx.com",
-        password: "admin",
-      })
-    adminToken = responseToken.token;
-
-
   });
 
   afterAll(async () => {
@@ -40,6 +29,15 @@ describe("Create Category Controller", () => {
 
 
   it('Should be able to create a new category', async () => {
+
+    const responseToken = await request(app)
+      .post('/sessions')
+      .send({
+        email: "admin@rentx.com",
+        password: "admin",
+      })
+    const { refresh_token } = responseToken.body;
+
     const response = await request(app)
       .post('/categories')
       .send({
@@ -47,7 +45,7 @@ describe("Create Category Controller", () => {
         description: 'Description supertest',
       })
       .set({
-        Authorization: `Bearer ${adminToken}`,
+        Authorization: `Bearer ${refresh_token}`,
       });
 
     expect(response.status).toBe(201);
@@ -55,6 +53,17 @@ describe("Create Category Controller", () => {
 
   it('Should not be able to create a category with an existent name', async () => {
 
+
+
+    const responseToken = await request(app)
+      .post('/sessions')
+      .send({
+        email: "admin@rentx.com",
+        password: "admin",
+      })
+    const { refresh_token } = responseToken.body;
+
+
     const response = await request(app)
       .post('/categories')
       .send({
@@ -62,7 +71,7 @@ describe("Create Category Controller", () => {
         description: 'Description supertest',
       })
       .set({
-        Authorization: `Bearer ${adminToken}`,
+        Authorization: `Bearer ${refresh_token}`,
       });
 
     expect(response.status).toBe(400);
